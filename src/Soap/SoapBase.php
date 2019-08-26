@@ -147,6 +147,10 @@ abstract class SoapBase implements SoapInterface
      * @var int
      */
     public $waitingTime = 45;
+    /**
+     * @var string
+     */
+    public $cipherList;
     
     /**
      * SoapBase constructor.
@@ -225,6 +229,15 @@ abstract class SoapBase implements SoapInterface
             default:
                 $this->httpver = CURL_HTTP_VERSION_NONE;
         }
+    }
+
+    /**
+     * Set SSL Cipher List for cURL
+     * @param string $cipherList
+     */
+    public function setCipherList($cipherList = null)
+    {
+        $this->cipherList = $cipherList;
     }
     
     /**

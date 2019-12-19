@@ -151,7 +151,7 @@ abstract class SoapBase implements SoapInterface
      * @var string
      */
     public $cipherList;
-    
+
     /**
      * SoapBase constructor.
      * @param Certificate|null $certificate
@@ -208,7 +208,7 @@ abstract class SoapBase implements SoapInterface
     {
         return $this->disableCertValidation = $flag;
     }
-    
+
     /**
      * Force http protocol version
      *
@@ -239,7 +239,7 @@ abstract class SoapBase implements SoapInterface
     {
         $this->cipherList = $cipherList;
     }
-    
+
     /**
      * Load path to CA and enable to use on SOAP
      * @param string $capath
@@ -263,7 +263,7 @@ abstract class SoapBase implements SoapInterface
         $this->encriptPrivateKey = $encript;
         return $this->encriptPrivateKey;
     }
-   
+
     /**
      * Set another temporayfolder for saving certificates for SOAP utilization
      * @param string | null $folderRealPath
@@ -271,11 +271,18 @@ abstract class SoapBase implements SoapInterface
      */
     public function setTemporaryFolder($folderRealPath = null)
     {
+        $mapto = $this->certificate->getCnpj() ?? $this->certificate->getCpf();
+        if (empty($mapto)) {
+            throw new RuntimeException(
+                'Foi impossivel identificar o OID do CNPJ ou do CPF.'
+            );
+        }
+
         if (empty($folderRealPath)) {
             $path = '/sped-'
                 . $this->uid()
                 .'/'
-                . $this->certificate->getCnpj()
+                . $mapto
                 . '/' ;
             $folderRealPath = sys_get_temp_dir().$path;
         }
@@ -285,7 +292,7 @@ abstract class SoapBase implements SoapInterface
         $this->tempdir = $folderRealPath;
         $this->setLocalFolder($folderRealPath);
     }
-    
+
     /**
      * Return uid from user
      * @return string
@@ -298,7 +305,7 @@ abstract class SoapBase implements SoapInterface
             return getmyuid();
         }
     }
- 
+
     /**
      * Set Local folder for flysystem
      * @param string $folder
@@ -554,7 +561,7 @@ abstract class SoapBase implements SoapInterface
             );
         }
     }
-    
+
     /**
      * Create a unique random file name
      * @param integer $n

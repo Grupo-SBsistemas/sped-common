@@ -16,6 +16,35 @@ use ForceUTF8\Encoding;
 
 class Strings
 {
+        /**
+     * Includes missing or unsupported properties in stdClass inputs
+     * and Replace all unsuported chars
+     *
+     * @param \stdClass $std
+     * @param array $possible
+     * @return \stdClass
+     */
+    public static function equilizeParameters(
+        \stdClass $std,
+        $possible,
+        $replaceAccentedChars = false
+    ) {
+        $arr = get_object_vars($std);
+        foreach ($possible as $key) {
+            if (!array_key_exists($key, $arr)) {
+                $std->$key = null;
+            } else {
+                if (is_string($std->$key)) {
+                    $std->$key = trim(self::replaceUnacceptableCharacters($std->$key));
+                    if ($replaceAccentedChars) {
+                        $std->$key = self::toASCII($std->$key);
+                    }
+                }
+            }
+        }
+        return $std;
+    }
+
     /**
      * Replace all specials characters from string and retuns only 128 basics
      * NOTE: only for UTF-8
@@ -29,7 +58,7 @@ class Strings
         $string = preg_replace("/[^a-zA-Z0-9 @#,-_.;:$%\/]/", "", $string);
         return preg_replace("/[<>]/", "", $string);
     }
-    
+
     /**
      * Clear inputs for build in XML
      * Only UTF-8 characters is acceptable
@@ -56,7 +85,7 @@ class Strings
         $input = self::normalize($input);
         return trim($input);
     }
-    
+
     /**
      * Converts all UTF-8 remains in ASCII
      * @param string $input
@@ -68,7 +97,7 @@ class Strings
         $input = self::squashCharacters($input);
         return mb_convert_encoding($input, 'ascii');
     }
-    
+
     /**
      * Replaces all accented characters of their ASCII equivalents
      * @param string $input
@@ -83,7 +112,7 @@ class Strings
             'c','A','A','A','A','E','E','I','O','O','O','U','U','C'];
         return str_replace($aFind, $aSubs, $input);
     }
-    
+
     /**
      * Replace all non-UTF-8 chars to UTF-8
      * Remove all control chars
@@ -123,7 +152,7 @@ class Strings
     {
         return preg_replace("/[^0-9]/", "", $string);
     }
-    
+
     /**
      * Remove unwanted attributes, prefixes, sulfixes and other control
      * characters like \r \n \s \t
@@ -149,7 +178,7 @@ class Strings
         }
         return $retXml;
     }
-    
+
     /**
      * Remove all characters between markers
      * @param string $string
@@ -167,7 +196,7 @@ class Strings
         $textToDelete = substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos);
         return str_replace($textToDelete, '', $string);
     }
-    
+
     /**
      * Clears the xml after adding the protocol, removing repeated namespaces
      * @param string $string
@@ -186,7 +215,7 @@ class Strings
         }
         return $procXML;
     }
-    
+
     /**
      * Remove some alien chars from txt
      * @param string $txt
@@ -202,7 +231,7 @@ class Strings
         $txt = str_replace(["| "," |"], "|", $txt);
         return $txt;
     }
-    
+
     /**
      * Creates a string ramdomically with the specified length
      * @param int $length
